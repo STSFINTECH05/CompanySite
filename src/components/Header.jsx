@@ -10,6 +10,8 @@ import {
 } from 'lucide-react';
 
 export default function Header({
+  activeTab = 'home',
+  onNavigate,
   onSearch,
   onSignIn,
   onGetStarted
@@ -82,7 +84,13 @@ export default function Header({
       <div className="w-full px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between">
         
         {/* ================= FAR LEFT: Logo & Brand Text ================= */}
-        <div className="flex items-center gap-3">
+        <div 
+          onClick={() => onNavigate && onNavigate('home')}
+          className="flex items-center gap-3 cursor-pointer group select-none"
+          role="button"
+          tabIndex={0}
+          aria-label="Go to STS-FINTECH home"
+        >
           {/* Logo icon: Green rounded shield outline with accent glow */}
           <div className="relative flex items-center justify-center w-10 h-10 rounded-xl border-2 border-emerald-500 bg-emerald-50/90 shadow-[0_0_16px_rgba(16,185,129,0.35)] group transition-transform hover:scale-105">
             <Shield className="w-5 h-5 text-emerald-600 transition-transform duration-200 group-hover:scale-110" />
@@ -93,7 +101,7 @@ export default function Header({
 
           {/* Brand text: Bold "STS-FINTECH" with subtitle "FINANCIAL ECOSYSTEM" */}
           <div className="flex flex-col">
-            <span className="font-extrabold text-lg sm:text-xl tracking-tight text-slate-900 leading-tight">
+            <span className="font-extrabold text-lg sm:text-xl tracking-tight text-slate-900 leading-tight group-hover:text-emerald-700 transition-colors">
               STS-FINTECH
             </span>
             <span className="text-[9px] font-bold tracking-[0.22em] text-emerald-600 uppercase font-mono -mt-0.5">
@@ -107,30 +115,40 @@ export default function Header({
           
           {/* 1. Careers: Positioned directly to the left of "Product" with "We're hiring!" badge */}
           <div className="relative" ref={careersRef}>
-            <button
-              type="button"
-              onClick={() => {
-                setCareersOpen(!careersOpen);
-                setProductOpen(false);
-              }}
-              className={`group flex items-center gap-1.5 text-sm font-semibold transition-colors py-1 ${
-                careersOpen ? 'text-emerald-600' : 'text-slate-600 hover:text-emerald-600'
-              }`}
-              aria-expanded={careersOpen}
-              aria-haspopup="true"
-            >
-              <span>Careers</span>
-              {/* Hiring Badge: "We're hiring!" + green pulse dot */}
-              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200 shadow-2xs">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                We're hiring!
-              </span>
-              <ChevronDown
-                className={`w-3.5 h-3.5 transition-transform duration-200 ${
-                  careersOpen ? 'rotate-180 text-emerald-600' : 'text-slate-400 group-hover:text-emerald-600'
+            <div className="flex items-center">
+              <button
+                type="button"
+                onClick={() => {
+                  if (onNavigate) onNavigate('careers');
+                }}
+                className={`group flex items-center gap-1.5 text-sm font-semibold transition-colors py-1 relative after:absolute after:bottom-0 after:left-0 after:h-[2px] after:bg-emerald-500 after:transition-all after:duration-200 ${
+                  activeTab === 'careers' ? 'text-emerald-600 after:w-full font-bold' : 'text-slate-600 hover:text-emerald-600 after:w-0 hover:after:w-full'
                 }`}
-              />
-            </button>
+                aria-label="Navigate to Careers"
+              >
+                <span>Careers</span>
+                {/* Hiring Badge: "We're hiring!" + green pulse dot */}
+                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200 shadow-2xs">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  We're hiring!
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setCareersOpen(!careersOpen);
+                  setProductOpen(false);
+                }}
+                className="p-1 ml-0.5 text-slate-400 hover:text-emerald-600 transition-colors"
+                aria-label="Toggle careers menu"
+              >
+                <ChevronDown
+                  className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                    careersOpen ? 'rotate-180 text-emerald-600' : 'group-hover:text-emerald-600'
+                  }`}
+                />
+              </button>
+            </div>
 
             {/* Careers Dropdown Menu */}
             {careersOpen && (
@@ -146,11 +164,14 @@ export default function Header({
 
                 <div className="py-1">
                   {CAREER_ROLES.map((role, idx) => (
-                    <a
+                    <button
                       key={idx}
-                      href="#careers"
-                      onClick={() => setCareersOpen(false)}
-                      className="flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-emerald-50/80 transition-colors group"
+                      type="button"
+                      onClick={() => {
+                        if (onNavigate) onNavigate('careers', role);
+                        setCareersOpen(false);
+                      }}
+                      className="w-full text-left flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-emerald-50/80 transition-colors group cursor-pointer"
                     >
                       <div className="flex items-center gap-2.5">
                         <div className="p-1.5 rounded-lg bg-emerald-100/60 text-emerald-700 group-hover:bg-emerald-500 group-hover:text-white transition-colors">
@@ -166,19 +187,22 @@ export default function Header({
                         </div>
                       </div>
                       <ArrowRight className="w-3.5 h-3.5 text-slate-400 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 text-emerald-600 transition-all" />
-                    </a>
+                    </button>
                   ))}
                 </div>
 
                 <div className="p-1.5 border-t border-slate-100">
-                  <a
-                    href="#careers"
-                    onClick={() => setCareersOpen(false)}
-                    className="flex items-center justify-center gap-1.5 w-full py-1.5 text-xs font-bold text-emerald-700 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 rounded-xl transition-colors"
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (onNavigate) onNavigate('careers');
+                      setCareersOpen(false);
+                    }}
+                    className="flex items-center justify-center gap-1.5 w-full py-1.5 text-xs font-bold text-emerald-700 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 rounded-xl transition-colors cursor-pointer"
                   >
                     <span>View All Openings</span>
                     <ArrowRight className="w-3.5 h-3.5" />
-                  </a>
+                  </button>
                 </div>
               </div>
             )}
@@ -270,20 +294,26 @@ export default function Header({
           </div>
 
           {/* 3. About */}
-          <a
-            href="#about"
-            className="text-sm font-semibold text-slate-600 hover:text-emerald-600 transition-colors relative py-1 after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-emerald-500 hover:after:w-full after:transition-all after:duration-200"
+          <button
+            type="button"
+            onClick={() => onNavigate && onNavigate('about')}
+            className={`text-sm font-semibold transition-colors relative py-1 after:absolute after:bottom-0 after:left-0 after:h-[2px] after:bg-emerald-500 after:transition-all after:duration-200 cursor-pointer ${
+              activeTab === 'about' ? 'text-emerald-600 after:w-full font-bold' : 'text-slate-600 hover:text-emerald-600 after:w-0 hover:after:w-full'
+            }`}
           >
             About
-          </a>
+          </button>
 
           {/* 4. Contact */}
-          <a
-            href="#contact"
-            className="text-sm font-semibold text-slate-600 hover:text-emerald-600 transition-colors relative py-1 after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-emerald-500 hover:after:w-full after:transition-all after:duration-200"
+          <button
+            type="button"
+            onClick={() => onNavigate && onNavigate('contact')}
+            className={`text-sm font-semibold transition-colors relative py-1 after:absolute after:bottom-0 after:left-0 after:h-[2px] after:bg-emerald-500 after:transition-all after:duration-200 cursor-pointer ${
+              activeTab === 'contact' ? 'text-emerald-600 after:w-full font-bold' : 'text-slate-600 hover:text-emerald-600 after:w-0 hover:after:w-full'
+            }`}
           >
             Contact
-          </a>
+          </button>
         </nav>
 
         {/* ================= FAR RIGHT: Search, Notifications, Auth ================= */}
@@ -409,30 +439,45 @@ export default function Header({
 
             {/* Mobile Careers Accordion */}
             <div>
-              <button
-                type="button"
-                onClick={() => setMobileCareersOpen(!mobileCareersOpen)}
-                className="flex items-center justify-between w-full text-sm font-semibold text-slate-700 hover:text-emerald-600 py-1"
-              >
-                <span className="flex items-center gap-2">
+              <div className="flex items-center justify-between w-full py-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (onNavigate) onNavigate('careers');
+                    setMobileMenuOpen(false);
+                  }}
+                  className={`flex items-center gap-2 text-sm font-semibold transition-colors cursor-pointer ${
+                    activeTab === 'careers' ? 'text-emerald-600 font-bold' : 'text-slate-700 hover:text-emerald-600'
+                  }`}
+                >
                   <span>Careers</span>
                   <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
                     We're hiring!
                   </span>
-                </span>
-                <ChevronDown className={`w-4 h-4 transition-transform ${mobileCareersOpen ? 'rotate-180' : ''}`} />
-              </button>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMobileCareersOpen(!mobileCareersOpen)}
+                  className="p-1 text-slate-400 hover:text-emerald-600"
+                  aria-label="Toggle mobile careers"
+                >
+                  <ChevronDown className={`w-4 h-4 transition-transform ${mobileCareersOpen ? 'rotate-180' : ''}`} />
+                </button>
+              </div>
               {mobileCareersOpen && (
                 <div className="pl-3 py-2 space-y-2 border-l-2 border-emerald-200 ml-1 mt-1">
                   {CAREER_ROLES.map((role, idx) => (
-                    <a
+                    <button
                       key={idx}
-                      href="#careers"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="block text-xs font-semibold text-slate-600 hover:text-emerald-600 py-1"
+                      type="button"
+                      onClick={() => {
+                        if (onNavigate) onNavigate('careers', role);
+                        setMobileMenuOpen(false);
+                      }}
+                      className="block w-full text-left text-xs font-semibold text-slate-600 hover:text-emerald-600 py-1 cursor-pointer"
                     >
                       {role.title} <span className="text-[10px] text-slate-400 font-normal">({role.dept})</span>
-                    </a>
+                    </button>
                   ))}
                 </div>
               )}
@@ -443,7 +488,7 @@ export default function Header({
               <button
                 type="button"
                 onClick={() => setMobileProductOpen(!mobileProductOpen)}
-                className="flex items-center justify-between w-full text-sm font-semibold text-slate-700 hover:text-emerald-600 py-1"
+                className="flex items-center justify-between w-full text-sm font-semibold text-slate-700 hover:text-emerald-600 py-1 cursor-pointer"
               >
                 <span className="flex items-center gap-2">
                   <span>Product</span>
@@ -474,20 +519,30 @@ export default function Header({
               )}
             </div>
 
-            <a
-              href="#about"
-              onClick={() => setMobileMenuOpen(false)}
-              className="text-sm font-semibold text-slate-700 hover:text-emerald-600 py-1"
+            <button
+              type="button"
+              onClick={() => {
+                if (onNavigate) onNavigate('about');
+                setMobileMenuOpen(false);
+              }}
+              className={`text-left text-sm font-semibold py-1 transition-colors cursor-pointer ${
+                activeTab === 'about' ? 'text-emerald-600 font-bold' : 'text-slate-700 hover:text-emerald-600'
+              }`}
             >
               About
-            </a>
-            <a
-              href="#contact"
-              onClick={() => setMobileMenuOpen(false)}
-              className="text-sm font-semibold text-slate-700 hover:text-emerald-600 py-1"
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                if (onNavigate) onNavigate('contact');
+                setMobileMenuOpen(false);
+              }}
+              className={`text-left text-sm font-semibold py-1 transition-colors cursor-pointer ${
+                activeTab === 'contact' ? 'text-emerald-600 font-bold' : 'text-slate-700 hover:text-emerald-600'
+              }`}
             >
               Contact
-            </a>
+            </button>
           </div>
         </div>
       )}
