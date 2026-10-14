@@ -1,0 +1,103 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  }
+  body {
+    background-color: #ffffff;
+    color: #0f172a;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+/* 3D Extruded Lettering Style for STS and FINTECH */
+.sts-3d-title {
+  color: #0d1612;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.03em;
+  line-height: 0.88;
+  -webkit-text-stroke: 1px rgba(16, 185, 129, 0.3);
+  text-shadow:
+    1px 1px 0 #059669,
+    2px 2px 0 #047857,
+    3px 3px 0 #065f46,
+    4px 4px 0 #064e3b,
+    6px 8px 14px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  display: inline-block;
+}
+
+.sts-3d-title:hover {
+  -webkit-text-stroke: 1px rgba(52, 211, 153, 0.6);
+  text-shadow:
+    1px 1px 0 #34d399,
+    2px 2px 0 #10b981,
+    3px 3px 0 #059669,
+    4px 4px 0 #047857,
+    5px 5px 0 #065f46,
+    6px 6px 0 #064e3b,
+    8px 12px 20px rgba(0, 0, 0, 0.35),
+    0 0 25px rgba(52, 211, 153, 0.65);
+  transform: translateY(-3px);
+}
+
+/* Individual Interactive 3D Letters with Arch Offset & Hover Zoom */
+.sts-3d-letter {
+  color: #0d1612;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 900;
+  text-transform: uppercase;
+  display: inline-block;
+  user-select: none;
+  cursor: pointer;
+  -webkit-text-stroke: 1px rgba(16, 185, 129, 0.35);
+  text-shadow:
+    1px 1px 0 #059669,
+    2px 2px 0 #047857,
+    3px 3px 0 #065f46,
+    4px 4px 0 #064e3b,
+    6px 8px 14px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), text-shadow 0.2s ease-out, -webkit-text-stroke 0.2s ease-out;
+  transform-origin: center bottom;
+  will-change: transform, text-shadow;
+}
+
+.sts-3d-letter:hover,
+.sts-3d-letter.is-active {
+  -webkit-text-stroke: 1.5px rgba(52, 211, 153, 0.85);
+  text-shadow:
+    1px 1px 0 #34d399,
+    2px 2px 0 #10b981,
+    3px 3px 0 #059669,
+    4px 4px 0 #047857,
+    5px 5px 0 #065f46,
+    6px 6px 0 #064e3b,
+    8px 12px 22px rgba(0, 0, 0, 0.35),
+    0 0 25px rgba(52, 211, 153, 0.65),
+    0 0 45px rgba(16, 185, 129, 0.45);
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f8fafc;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
