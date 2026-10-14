@@ -22,11 +22,12 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - name: Build Application
-        run: npm run build
-
-      - name: Deploy to Vercel
+      - name: Build and Deploy to Vercel
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: "prj_Yyr0qVLGSD1Id0R4GPsJnEP3QqZ9"
         run: |
-          npx vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN --yes
+          npx vercel pull --yes --environment=production --token=$VERCEL_TOKEN
+          npx vercel build --prod --token=$VERCEL_TOKEN
+          npx vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN
