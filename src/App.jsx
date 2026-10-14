@@ -25,10 +25,173 @@ import {
   ReceiptText
 } from 'lucide-react';
 import Header from './components/Header';
+import AdminPortal from './components/AdminPortal';
+
+// Default 4 Roles
+const DEFAULT_OPEN_ROLES = [
+  {
+    id: 'full-stack',
+    title: 'Full Stack Developer',
+    dept: 'Engineering',
+    type: 'Full-time / Hybrid',
+    location: 'Bengaluru, India (Hybrid)',
+    experience: '3+ Years',
+    salary: '₹18L - ₹28L CTC + ESOPs',
+    status: 'Active',
+    stack: ['React.js', 'Node.js', 'Express', 'PostgreSQL', 'REST APIs', 'Tailwind CSS'],
+    responsibilities: [
+      'Architect and implement responsive, high-performance web applications using React and Tailwind CSS.',
+      'Design resilient RESTful APIs with Node.js and Express to drive daily ledger tracking and balance sync.',
+      'Optimize PostgreSQL database schemas, indexing strategies, and multi-tenant security layers.',
+      'Partner with product and UI/UX designers to translate complex financial concepts into frictionless workflows.'
+    ],
+    requirements: [
+      '3+ years of professional full-stack web engineering experience with modern React and Node.js.',
+      'Proficiency in relational database design (PostgreSQL/MySQL), transactions, and connection pooling.',
+      'Strong knowledge of state management, client performance profiling, and accessible web standards.',
+      'Passion for building high-trust financial systems with clean architecture and comprehensive unit tests.'
+    ]
+  },
+  {
+    id: 'backend',
+    title: 'Backend Developer',
+    dept: 'Core Banking & APIs',
+    type: 'Full-time',
+    location: 'Bengaluru, India (On-site / Hybrid)',
+    experience: '3+ Years',
+    salary: '₹20L - ₹32L CTC + ESOPs',
+    status: 'Active',
+    stack: ['Node.js', 'Express', 'Database Design', 'Scalable API Architecture', 'Redis', 'Webhooks'],
+    responsibilities: [
+      'Architect and maintain high-throughput, low-latency microservices powering instant UPI split transactions.',
+      'Ensure sub-50ms API response times and 99.99% availability for payment webhooks and sync events.',
+      'Implement robust double-entry ledger databases, idempotency keys, and automated reconciliation routines.',
+      'Enforce bank-grade tokenization, automated rate limiting, and regulatory compliance standards.'
+    ],
+    requirements: [
+      '3+ years of backend engineering expertise in Node.js, Express, and distributed API systems.',
+      'Deep understanding of database isolation levels, Redis caching, and asynchronous message patterns.',
+      'Hands-on experience integrating payment gateways, UPI webhooks, or financial core protocols.',
+      'Commitment to writing zero-defect, self-healing services with strict telemetry and observability.'
+    ]
+  },
+  {
+    id: 'package-analyst',
+    title: 'Package Analyst',
+    dept: 'Fintech Operations & DevOps',
+    type: 'Full-time',
+    location: 'Bengaluru, India',
+    experience: '2+ Years',
+    salary: '₹14L - ₹22L CTC',
+    status: 'Active',
+    stack: ['Package Management', 'Release Dependencies', 'Vite & Rollup', 'CI/CD Pipelines', 'SBOM & Security'],
+    responsibilities: [
+      'Continually audit, curate, and optimize NPM package dependencies to eliminate bundle bloat and vulnerabilities.',
+      'Supervise release dependencies, semver governance, and automated CI/CD deployment pipelines on Vercel and Docker.',
+      'Identify tree-shaking opportunities, dead code elimination, and compression gains across production artifacts.',
+      'Coordinate versioning rollouts, dependency drift monitoring, and zero-downtime release strategies.'
+    ],
+    requirements: [
+      'In-depth mastery of modern JavaScript package ecosystems (npm, pnpm, yarn) and lockfile semantics.',
+      'Practical experience with modern bundlers (Vite, Rollup, Webpack) and automated CI/CD (GitHub Actions).',
+      'Strong awareness of software supply chain security standards (SBOM, CVE analysis, Dependabot).',
+      'Analytical mindset with sharp attention to detail when benchmarking build times and runtime payloads.'
+    ]
+  },
+  {
+    id: 'hr',
+    title: 'HR (Human Resources)',
+    dept: 'People & Culture',
+    type: 'Full-time',
+    location: 'Bengaluru, India',
+    experience: '2+ Years',
+    salary: '₹10L - ₹16L CTC',
+    status: 'Active',
+    stack: ['Talent Acquisition', 'Technical Hiring Pipelines', 'Culture & Engagement', 'Employee Operations'],
+    responsibilities: [
+      'Drive end-to-end talent acquisition for elite engineering, product, and fintech operations roles.',
+      'Curate world-class onboarding, career progression ladders, and employee retention programs.',
+      'Foster an inclusive, transparent engineering culture emphasizing high ownership and intellectual curiosity.',
+      'Manage statutory HR operations, payroll compliance, benefits, and regular team wellness initiatives.'
+    ],
+    requirements: [
+      '2+ years of technical recruitment or HR business partner experience within high-growth tech startups.',
+      'Proven track record of sourcing, engaging, and closing top-tier engineering talent.',
+      'Exceptional empathetic communication, interpersonal intelligence, and negotiation skills.',
+      'Familiarity with Indian labor compliance, startup compensation models, and modern ATS platforms.'
+    ]
+  }
+];
+
+// Initial Inquiries for Inbox
+const INITIAL_INQUIRIES = [
+  {
+    id: 'inq-101',
+    name: 'Vikram Malhotra',
+    email: 'vikram.m@paystream.in',
+    subject: 'Issue linking expense account via UPI webhook',
+    message: 'When connecting ICICI corporate salary account via UPI webhook, the transaction verification loop hangs with error code 504 Gateway Timeout. Need assistance from your core banking integrations team.',
+    time: '12m ago',
+    status: 'New'
+  },
+  {
+    id: 'inq-102',
+    name: 'Pooja Sundaram',
+    email: 'pooja@growthcommerce.co',
+    subject: 'API integration inquiry for B2B billing',
+    message: 'We are an e-commerce platform processing over 45k daily splits and merchant settlements. We would love to evaluate your high-throughput double-entry ledger REST APIs and discuss enterprise SLA pricing.',
+    time: '2h ago',
+    status: 'In Review'
+  },
+  {
+    id: 'inq-103',
+    name: 'Arjun Nambiar',
+    email: 'arjun.nambiar@gmail.com',
+    subject: 'Discrepancy in shared dinner split calculation',
+    message: 'When splitting ₹4,800 among 5 flatmates with an uneven tip calculation, ₹12 remained unallocated in the preview card before final ledger settlement. Log attached.',
+    time: 'Yesterday',
+    status: 'Resolved'
+  }
+];
 
 export default function STSFintechApp() {
-  // Navigation State: 'home' | 'careers' | 'about' | 'contact'
+  // Client-Side Routing: '/stsadminlogin' vs public '/'
+  const [currentPath, setCurrentPath] = useState(() => {
+    return typeof window !== 'undefined' ? window.location.pathname : '/';
+  });
+
+  // Public Navigation State: 'home' | 'careers' | 'about' | 'contact'
   const [activeTab, setActiveTab] = useState('home');
+
+  // Shared Jobs State (Persisted in localStorage)
+  const [jobs, setJobs] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('sts_fintech_jobs');
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch (e) {
+          console.error('Failed to parse saved jobs', e);
+        }
+      }
+    }
+    return DEFAULT_OPEN_ROLES;
+  });
+
+  // Shared Contact Inquiries State (Persisted in localStorage)
+  const [inquiries, setInquiries] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('sts_fintech_inquiries');
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch (e) {
+          console.error('Failed to parse saved inquiries', e);
+        }
+      }
+    }
+    return INITIAL_INQUIRIES;
+  });
 
   // Modals & Active Role
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
@@ -61,7 +224,25 @@ export default function STSFintechApp() {
   // Curved 3D Typography Hover State
   const [activeLetterId, setActiveLetterId] = useState(null);
 
-  // Handle Navigation with scroll to top
+  // Listen to popstate for browser back/forward buttons
+  useEffect(() => {
+    const handlePopState = () => {
+      setCurrentPath(window.location.pathname);
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  // Client-Side Route Changer
+  const navigateTo = (path) => {
+    if (typeof window !== 'undefined') {
+      window.history.pushState({}, '', path);
+      setCurrentPath(path);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  // Public tab navigator
   const handleNavigate = (tab, role = null) => {
     setActiveTab(tab);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -88,93 +269,15 @@ export default function STSFintechApp() {
     { char: 'H', dy: 14, rot: 4.5 },
   ];
 
-  // 4 Detailed Open Roles
-  const OPEN_ROLES = [
-    {
-      id: 'full-stack',
-      title: 'Full Stack Developer',
-      dept: 'Engineering',
-      type: 'Full-time / Hybrid',
-      location: 'Bengaluru, India (Hybrid)',
-      icon: Code2,
-      stack: ['React.js', 'Node.js', 'Express', 'PostgreSQL', 'REST APIs', 'Tailwind CSS'],
-      responsibilities: [
-        'Architect and implement responsive, high-performance web applications using React and Tailwind CSS.',
-        'Design resilient RESTful APIs with Node.js and Express to drive daily ledger tracking and balance sync.',
-        'Optimize PostgreSQL database schemas, indexing strategies, and multi-tenant security layers.',
-        'Partner with product and UI/UX designers to translate complex financial concepts into frictionless workflows.'
-      ],
-      requirements: [
-        '3+ years of professional full-stack web engineering experience with modern React and Node.js.',
-        'Proficiency in relational database design (PostgreSQL/MySQL), transactions, and connection pooling.',
-        'Strong knowledge of state management, client performance profiling, and accessible web standards.',
-        'Passion for building high-trust financial systems with clean architecture and comprehensive unit tests.'
-      ]
-    },
-    {
-      id: 'backend',
-      title: 'Backend Developer',
-      dept: 'Core Banking & APIs',
-      type: 'Full-time',
-      location: 'Bengaluru, India (On-site / Hybrid)',
-      icon: Server,
-      stack: ['Node.js', 'Express', 'Database Design', 'Scalable API Architecture', 'Redis', 'Webhooks'],
-      responsibilities: [
-        'Architect and maintain high-throughput, low-latency microservices powering instant UPI split transactions.',
-        'Ensure sub-50ms API response times and 99.99% availability for payment webhooks and sync events.',
-        'Implement robust double-entry ledger databases, idempotency keys, and automated reconciliation routines.',
-        'Enforce bank-grade tokenization, automated rate limiting, and regulatory compliance standards.'
-      ],
-      requirements: [
-        '3+ years of backend engineering expertise in Node.js, Express, and distributed API systems.',
-        'Deep understanding of database isolation levels, Redis caching, and asynchronous message patterns.',
-        'Hands-on experience integrating payment gateways, UPI webhooks, or financial core protocols.',
-        'Commitment to writing zero-defect, self-healing services with strict telemetry and observability.'
-      ]
-    },
-    {
-      id: 'package-analyst',
-      title: 'Package Analyst',
-      dept: 'Fintech Operations & DevOps',
-      type: 'Full-time',
-      location: 'Bengaluru, India',
-      icon: PackageCheck,
-      stack: ['Package Management', 'Release Dependencies', 'Vite & Rollup', 'CI/CD Pipelines', 'SBOM & Security'],
-      responsibilities: [
-        'Continually audit, curate, and optimize NPM package dependencies to eliminate bundle bloat and vulnerabilities.',
-        'Supervise release dependencies, semver governance, and automated CI/CD deployment pipelines on Vercel and Docker.',
-        'Identify tree-shaking opportunities, dead code elimination, and compression gains across production artifacts.',
-        'Coordinate versioning rollouts, dependency drift monitoring, and zero-downtime release strategies.'
-      ],
-      requirements: [
-        'In-depth mastery of modern JavaScript package ecosystems (npm, pnpm, yarn) and lockfile semantics.',
-        'Practical experience with modern bundlers (Vite, Rollup, Webpack) and automated CI/CD (GitHub Actions).',
-        'Strong awareness of software supply chain security standards (SBOM, CVE analysis, Dependabot).',
-        'Analytical mindset with sharp attention to detail when benchmarking build times and runtime payloads.'
-      ]
-    },
-    {
-      id: 'hr',
-      title: 'HR (Human Resources)',
-      dept: 'People & Culture',
-      type: 'Full-time',
-      location: 'Bengaluru, India',
-      icon: Users2,
-      stack: ['Talent Acquisition', 'Technical Hiring Pipelines', 'Culture & Engagement', 'Employee Operations'],
-      responsibilities: [
-        'Drive end-to-end talent acquisition for elite engineering, product, and fintech operations roles.',
-        'Curate world-class onboarding, career progression ladders, and employee retention programs.',
-        'Foster an inclusive, transparent engineering culture emphasizing high ownership and intellectual curiosity.',
-        'Manage statutory HR operations, payroll compliance, benefits, and regular team wellness initiatives.'
-      ],
-      requirements: [
-        '2+ years of technical recruitment or HR business partner experience within high-growth tech startups.',
-        'Proven track record of sourcing, engaging, and closing top-tier engineering talent.',
-        'Exceptional empathetic communication, interpersonal intelligence, and negotiation skills.',
-        'Familiarity with Indian labor compliance, startup compensation models, and modern ATS platforms.'
-      ]
-    }
-  ];
+  // Helper to determine role icon
+  const getRoleIcon = (dept = '', title = '') => {
+    const combined = `${dept} ${title}`.toLowerCase();
+    if (combined.includes('full stack') || combined.includes('frontend') || combined.includes('dev')) return Code2;
+    if (combined.includes('backend') || combined.includes('api') || combined.includes('core')) return Server;
+    if (combined.includes('package') || combined.includes('devops') || combined.includes('operation')) return PackageCheck;
+    if (combined.includes('hr') || combined.includes('people') || combined.includes('talent')) return Users2;
+    return Briefcase;
+  };
 
   // Handle Application Submit
   const handleApplicationSubmit = (e) => {
@@ -198,13 +301,28 @@ export default function STSFintechApp() {
     }, 1000);
   };
 
-  // Handle Contact Submit
+  // Handle Contact Submit (Appends to Admin Inbox)
   const handleContactSubmit = (e) => {
     e.preventDefault();
     setIsSubmittingContact(true);
     setTimeout(() => {
       setIsSubmittingContact(false);
       setContactSuccessToast(true);
+
+      const newInquiry = {
+        id: `inq-${Date.now()}`,
+        name: contactForm.name.trim(),
+        email: contactForm.email.trim(),
+        subject: contactForm.subject,
+        message: contactForm.message.trim(),
+        time: 'Just now',
+        status: 'New'
+      };
+
+      const updatedInquiries = [newInquiry, ...inquiries];
+      setInquiries(updatedInquiries);
+      localStorage.setItem('sts_fintech_inquiries', JSON.stringify(updatedInquiries));
+
       setContactForm({
         name: '',
         email: '',
@@ -215,6 +333,37 @@ export default function STSFintechApp() {
         setContactSuccessToast(false);
       }, 4000);
     }, 900);
+  };
+
+  // Save Job from Admin Portal
+  const handleSaveJobFromAdmin = (savedJob) => {
+    const exists = jobs.some(j => j.id === savedJob.id);
+    const updated = exists 
+      ? jobs.map(j => j.id === savedJob.id ? savedJob : j)
+      : [savedJob, ...jobs];
+    setJobs(updated);
+    localStorage.setItem('sts_fintech_jobs', JSON.stringify(updated));
+  };
+
+  // Delete Job from Admin Portal
+  const handleDeleteJobFromAdmin = (jobId) => {
+    const updated = jobs.filter(j => j.id !== jobId);
+    setJobs(updated);
+    localStorage.setItem('sts_fintech_jobs', JSON.stringify(updated));
+  };
+
+  // Update Inquiry Status from Admin Portal
+  const handleUpdateInquiryStatus = (inqId, newStatus) => {
+    const updated = inquiries.map(inq => inq.id === inqId ? { ...inq, status: newStatus } : inq);
+    setInquiries(updated);
+    localStorage.setItem('sts_fintech_inquiries', JSON.stringify(updated));
+  };
+
+  // Delete Inquiry from Admin Portal
+  const handleDeleteInquiry = (inqId) => {
+    const updated = inquiries.filter(inq => inq.id !== inqId);
+    setInquiries(updated);
+    localStorage.setItem('sts_fintech_inquiries', JSON.stringify(updated));
   };
 
   /**
@@ -263,6 +412,29 @@ export default function STSFintechApp() {
     });
   };
 
+  // Active public roles (excluding Closed)
+  const publicRoles = jobs.filter(j => j.status !== 'Closed');
+
+  // =========================================================================
+  // ROUTE: ADMIN PORTAL (/stsadminlogin)
+  // =========================================================================
+  if (currentPath === '/stsadminlogin') {
+    return (
+      <AdminPortal
+        jobs={jobs}
+        onSaveJob={handleSaveJobFromAdmin}
+        onDeleteJob={handleDeleteJobFromAdmin}
+        inquiries={inquiries}
+        onUpdateInquiryStatus={handleUpdateInquiryStatus}
+        onDeleteInquiry={handleDeleteInquiry}
+        onViewLiveSite={() => navigateTo('/')}
+      />
+    );
+  }
+
+  // =========================================================================
+  // ROUTE: PUBLIC WEBSITE (/)
+  // =========================================================================
   return (
     <div className="min-h-screen bg-white text-slate-900 font-sans relative overflow-x-hidden selection:bg-emerald-500 selection:text-white flex flex-col justify-between">
       
@@ -388,13 +560,14 @@ export default function STSFintechApp() {
       </div>
 
       {/* =========================================================================
-          EDGE-TO-EDGE HEADER WITH INTEGRATED ROUTE NAVIGATION
+          EDGE-TO-EDGE HEADER WITH INTEGRATED ROUTE NAVIGATION & DYNAMIC ROLES
           ========================================================================= */}
       <Header 
         activeTab={activeTab}
         onNavigate={handleNavigate}
         onSignIn={() => setIsSignInModalOpen(true)}
         onGetStarted={() => setIsSignInModalOpen(true)}
+        roles={jobs}
       />
 
       {/* =========================================================================
@@ -490,7 +663,7 @@ export default function STSFintechApp() {
         )}
 
         {/* =======================================================================
-            VIEW 2: DEDICATED CAREERS / HIRING PAGE
+            VIEW 2: DEDICATED CAREERS / HIRING PAGE (Dynamic from jobs state)
             ======================================================================= */}
         {activeTab === 'careers' && (
           <section className="pt-10 sm:pt-14 pb-20 sm:pb-28 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto w-full animate-in fade-in slide-in-from-bottom-2 duration-200">
@@ -511,7 +684,7 @@ export default function STSFintechApp() {
               {/* Quick Perks Bar */}
               <div className="mt-8 flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-xs sm:text-sm font-semibold text-slate-700">
                 <span className="inline-flex items-center gap-1.5 bg-slate-50 px-3.5 py-1.5 rounded-full border border-slate-200">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600" /> 4 Open Roles
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" /> {publicRoles.length} Open Role{publicRoles.length === 1 ? '' : 's'}
                 </span>
                 <span className="inline-flex items-center gap-1.5 bg-slate-50 px-3.5 py-1.5 rounded-full border border-slate-200">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600" /> Full-time &amp; Hybrid
@@ -527,8 +700,12 @@ export default function STSFintechApp() {
 
             {/* Open Roles Cards Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-              {OPEN_ROLES.map((role) => {
-                const IconComponent = role.icon;
+              {publicRoles.map((role) => {
+                const IconComponent = getRoleIcon(role.dept, role.title);
+                const stackList = Array.isArray(role.stack) ? role.stack : (role.stack ? role.stack.split(',') : []);
+                const respList = Array.isArray(role.responsibilities) ? role.responsibilities : (role.responsibilities ? role.responsibilities.split('\n') : []);
+                const reqList = Array.isArray(role.requirements) ? role.requirements : (role.requirements ? role.requirements.split('\n') : []);
+
                 return (
                   <div
                     key={role.id}
@@ -549,57 +726,70 @@ export default function STSFintechApp() {
                           </div>
                         </div>
                         <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200 shrink-0">
-                          Active
+                          {role.status || 'Active'}
                         </span>
                       </div>
 
-                      {/* Location Badge */}
-                      <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium mb-4">
-                        <MapPin className="w-3.5 h-3.5 text-slate-400" />
-                        <span>{role.location}</span>
+                      {/* Location & Compensation Badge */}
+                      <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 font-medium mb-4">
+                        <span className="flex items-center gap-1.5">
+                          <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                          {role.location || 'Bengaluru, India'}
+                        </span>
+                        {role.salary && (
+                          <span className="flex items-center gap-1.5 text-emerald-700 font-semibold font-mono">
+                            • {role.salary}
+                          </span>
+                        )}
                       </div>
 
                       {/* Stack Pills */}
-                      <div className="flex flex-wrap gap-1.5 mb-6">
-                        {role.stack.map((tech, i) => (
-                          <span
-                            key={i}
-                            className="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 text-xs font-mono font-medium"
-                          >
-                            {tech}
-                          </span>
-                        ))}
-                      </div>
+                      {stackList.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5 mb-6">
+                          {stackList.map((tech, i) => (
+                            <span
+                              key={i}
+                              className="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 text-xs font-mono font-medium"
+                            >
+                              {tech.trim()}
+                            </span>
+                          ))}
+                        </div>
+                      )}
 
                       {/* Responsibilities */}
-                      <div className="mb-4">
-                        <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider font-mono mb-2">
-                          Key Responsibilities:
-                        </h3>
-                        <ul className="space-y-1.5 text-xs sm:text-sm text-slate-600">
-                          {role.responsibilities.map((resp, i) => (
-                            <li key={i} className="flex items-start gap-2">
-                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 shrink-0" />
-                              <span>{resp}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
+                      {respList.length > 0 && (
+                        <div className="mb-4">
+                          <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider font-mono mb-2">
+                            Key Responsibilities:
+                          </h3>
+                          <ul className="space-y-1.5 text-xs sm:text-sm text-slate-600">
+                            {respList.map((resp, i) => (
+                              <li key={i} className="flex items-start gap-2">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 shrink-0" />
+                                <span>{resp}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
 
                       {/* Requirements */}
-                      <div className="mb-6">
-                        <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider font-mono mb-2">
-                          Requirements:
-                        </h3>
-                        <ul className="space-y-1.5 text-xs sm:text-sm text-slate-600">
-                          {role.requirements.map((req, i) => (
-                            <li key={i} className="flex items-start gap-2">
-                              <span className="w-1.5 h-1.5 rounded-full bg-teal-500 mt-1.5 shrink-0" />
-                              <span>{req}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
+                      {reqList.length > 0 && (
+                        <div className="mb-6">
+                          <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider font-mono mb-2">
+                            Requirements:
+                          </h3>
+                          <ul className="space-y-1.5 text-xs sm:text-sm text-slate-600">
+                            {reqList.map((req, i) => (
+                              <li key={i} className="flex items-start gap-2">
+                                <span className="w-1.5 h-1.5 rounded-full bg-teal-500 mt-1.5 shrink-0" />
+                                <span>{req}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
                     </div>
 
                     {/* Apply Now Button */}
@@ -666,7 +856,7 @@ export default function STSFintechApp() {
             {/* Company Story & Origins */}
             <div className="bg-white rounded-3xl border border-slate-200 shadow-xl p-8 sm:p-10 mb-12">
               <h2 className="text-2xl font-bold text-slate-900 mb-4 flex items-center gap-2">
-                <Building2 className="w-6 h-6 text-emerald-600" />
+                <Briefcase className="w-6 h-6 text-emerald-600" />
                 Our Story: Why We Built STS-FINTECH
               </h2>
               <div className="space-y-4 text-slate-600 leading-relaxed text-sm sm:text-base">
@@ -777,7 +967,7 @@ export default function STSFintechApp() {
               <div className="mb-8 p-4 rounded-2xl bg-emerald-50 border border-emerald-300 flex items-center gap-3 text-emerald-900 shadow-lg animate-in fade-in duration-200">
                 <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
                 <div className="text-xs sm:text-sm font-semibold">
-                  Thank you! Your inquiry has been sent to our customer care team. We will respond within 24 hours.
+                  Thank you! Your inquiry has been sent directly to our support inbox. We will respond within 24 hours.
                 </div>
               </div>
             )}
@@ -998,6 +1188,13 @@ export default function STSFintechApp() {
               <span>ExpenseTrack</span>
               <ExternalLink className="w-3 h-3" />
             </a>
+            <button
+              onClick={() => navigateTo('/stsadminlogin')}
+              className="text-slate-400 hover:text-emerald-600 transition-colors cursor-pointer font-bold"
+              title="Admin Portal Login"
+            >
+              Admin Portal
+            </button>
           </div>
         </div>
       </footer>

@@ -14,7 +14,8 @@ export default function Header({
   onNavigate,
   onSearch,
   onSignIn,
-  onGetStarted
+  onGetStarted,
+  roles = null
 }) {
   const [careersOpen, setCareersOpen] = useState(false);
   const [productOpen, setProductOpen] = useState(false);
@@ -65,12 +66,16 @@ export default function Header({
     };
   }, []);
 
-  const CAREER_ROLES = [
+  const DEFAULT_ROLES = [
     { title: 'Full Stack Developer', dept: 'Engineering', type: 'Full-time' },
     { title: 'Backend Developer', dept: 'Core Banking & APIs', type: 'Full-time' },
     { title: 'Package Analyst', dept: 'Fintech Operations', type: 'Full-time' },
     { title: 'HR', dept: 'People & Culture', type: 'Full-time' },
   ];
+
+  const activeRolesList = (roles && roles.length > 0)
+    ? roles.filter(r => r.status !== 'Closed')
+    : DEFAULT_ROLES;
 
   const notificationsList = [
     { id: 1, title: 'UPI Split Settled', desc: 'Rahul sent ₹1,450 for Dinner split.', time: '5m ago' },
@@ -139,7 +144,7 @@ export default function Header({
                   setCareersOpen(!careersOpen);
                   setProductOpen(false);
                 }}
-                className="p-1 ml-0.5 text-slate-400 hover:text-emerald-600 transition-colors"
+                className="p-1 ml-0.5 text-slate-400 hover:text-emerald-600 transition-colors cursor-pointer"
                 aria-label="Toggle careers menu"
               >
                 <ChevronDown
@@ -158,12 +163,12 @@ export default function Header({
                     Open Roles
                   </span>
                   <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                    4 Positions
+                    {activeRolesList.length} Position{activeRolesList.length === 1 ? '' : 's'}
                   </span>
                 </div>
 
                 <div className="py-1">
-                  {CAREER_ROLES.map((role, idx) => (
+                  {activeRolesList.map((role, idx) => (
                     <button
                       key={idx}
                       type="button"
@@ -466,7 +471,7 @@ export default function Header({
               </div>
               {mobileCareersOpen && (
                 <div className="pl-3 py-2 space-y-2 border-l-2 border-emerald-200 ml-1 mt-1">
-                  {CAREER_ROLES.map((role, idx) => (
+                  {activeRolesList.map((role, idx) => (
                     <button
                       key={idx}
                       type="button"
